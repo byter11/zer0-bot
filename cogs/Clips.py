@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 from xboxapi import Client
@@ -8,7 +9,7 @@ import json
 class Clips(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.xclient = Client(api_key='2093d32cc36a743f0694f74ddfe96286985afc18')
+        self.xclient = Client(api_key= os.getenv(XBOX_KEY))
         self.gamer = self.xclient.gamer('NOOBboss162')
 
     def getClips(self):
