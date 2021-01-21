@@ -10,11 +10,11 @@ password = os.getenv('VALO_PASSWORD')
 region = "eu"
 
 maps = {
-  '/Game/Maps/Duality/Duality': 'bind.jpg',
-  '/Game/Maps/Bonsai/Bonsai': 'split.jpg',
-  '/Game/Maps/Ascent/Ascent': 'ascent.jpg',
-  '/Game/Maps/Port/Port': 'icebox.jpg',
-  '/Game/Maps/Triad/Triad': 'haven.jpg',
+  '/Game/Maps/Duality/Duality': 'Bind',
+  '/Game/Maps/Bonsai/Bonsai': 'Split',
+  '/Game/Maps/Ascent/Ascent': 'Ascent',
+  '/Game/Maps/Port/Port': 'Icebox',
+  '/Game/Maps/Triad/Triad': 'Haven'
 }
 
 class Valorant(commands.Cog):
@@ -52,13 +52,13 @@ class Valorant(commands.Cog):
             return
         self.db.execute('''SELECT * FROM Users''')
         while ( user := self.db.fetchone() ):
-            match = self.api.get_match_history(user[1], 5)["Matches"][1]
+            match = self.api.get_match_history(user[1], 1)["Matches"][0]
             # match = next((x for x in matches["Matches"] if int(x['RankedRatingEarned']) != 0), None)
             author = self.bot.get_user(int(user[0]))
             if not author:  author = await self.bot.fetch_user(int(user[0]))
             # print(author, match)
-            # if not match or user[2] == match["MatchID"]:
-                # continue
+            if not match or user[2] == match["MatchID"]:
+                continue
             #except: continue
             rating_earned = match["RankedRatingEarned"]
             print(author, rating_earned)
@@ -75,12 +75,12 @@ class Valorant(commands.Cog):
             rank_img = f'./val_assets/{match["TierAfterUpdate"]}.png'
             result = "Loss" if (rating_earned < 0) else "Win"
             
-            movement_img = f'attachment///val_assets/{movement}.png'
-            thumbnail = f'./val_assets/maps/{ maps[ match["MapID"] ] }'
-            print(movement_img, thumbnail)
+            movement_img = f'https://raw.githubusercontent.com/byter11/moSin-discord-bot/master/val_assets/{movement}.png'
+            thumbnail = f'https://raw.githubusercontent.com/byter11/moSin-discord-bot/master/val_assets/ranks/{match["TierAfterUpdate"]}.png'
+            # map_img = f'https://raw.githubusercontent.com/byter11/moSin-discord-bot/master/val_assets/maps/{maps[match["MapID"]]}'
 
             description = "rekt" if result=="Loss" else "gg"
-            embed = discord.Embed(title=result, description=description)
+            embed = discord.Embed(title=f'{result} - **{maps[match["MapID"]]}**', description=description)
             
 
             embed.set_author(name = author.name, icon_url=author.avatar_url)
