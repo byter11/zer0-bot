@@ -1,13 +1,19 @@
 import os
 import discord
+import json
 from discord.ext import commands, tasks
 from valApi import ValorantAPI
-import sqlite3
-conn = sqlite3.connect('valorant.db')
+import psycopg2
+
 
 username = os.getenv('VALO_USERNAME')
 password = os.getenv('VALO_PASSWORD')
 region = "eu"
+
+db_host = os.getenv('DB_HOST')
+db_user = os.getenv('DB_USER')
+db_pass = os.getenv('DB_PASS') 
+conn = psycopg2.connect(host=db_host, user=db_user, password=db_pass, dbname=db_user)
 
 maps = {
   '/Game/Maps/Duality/Duality': 'Bind',
@@ -21,50 +27,71 @@ class Valorant(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = conn.cursor()
-        self.api = ValorantAPI(username, password, region)
-        self.channel = None
-        self.send_results.start()
-    
+        self.channels = []
+        
+        
+       
     @commands.Cog.listener()
     async def on_ready(self):
         try:
             f = open(".channel", 'r')
-            self.channel = self.bot.get_channel(int(f.read()))
-            print (f'Valorant channel: {self.channel.name}')
-            f.close()
+            channels = json.load(f)
+            self.channels = [ self.bot.get_channel(id) for id in channels ]
+            if self.channels:
+                self.send_results.start()
         except Exception as e:
             print(e)
-        
+
+    @commands.command()
+    async def say(self,ctx, msg):
+        await ctx.send(msg)
+
     @commands.command(brief = "Setup Valorant on this channel")
     async def valsetup(self,ctx):
-        self.channel = ctx.message.channel
+        if ctx.message.channel.id in self.channels:
+            await ctx.send("Channel already registered.")
+            return
+
+        self.channels.append(ctx.message.channel)
         f = open(".channel", 'w')
-        f.write(str(self.channel.id))
+        ids = [c.id for c in self.channels]
+        json.dump(ids , f, indent=2)
         f.close()
-        await ctx.send(f'Set {self.channel} for VALORANT notifications!')
+        await ctx.send(f'Added {ctx.message.channel} for VALORANT notifications!')
+        self.send_results.start()
 
     def cog_unload(self):
         self.send_results.cancel()
 
-    @tasks.loop(minutes = 10)
+    @tasks.loop(minutes = 5)
     async def send_results(self):
-        if self.channel is None:
+        if not self.channels:
             return
         self.db.execute('''SELECT * FROM Users''')
-        while ( user := self.db.fetchone() ):
-            match = self.api.get_match_history(user[1], 1)["Matches"][0]
-            # match = next((x for x in matches["Matches"] if int(x['RankedRatingEarned']) != 0), None)
+        users = self.db.fetchall()
+        api = ValorantAPI(username, password, region)
+
+        for user in users:
             author = self.bot.get_user(int(user[0]))
             if not author:  author = await self.bot.fetch_user(int(user[0]))
-            # print(author, match)
-            if not match or user[2] == match["MatchID"]:
+            print(author, end=' ')
+            try:
+                match = api.get_match_history(user[1], 2)
+                match = match["Matches"][1]
+            except Exception as e:
+                print("\n", e)
                 continue
-            #except: continue
+            
             rating_earned = match["RankedRatingEarned"]
-            print(author, rating_earned)
+            print(rating_earned)
+            # print(author, match)
+            # if (user[2] == match["MatchID"]):
+            #     continue
+            #except: continue
+            
             if rating_earned == 0: continue
 
-            self.db.execute('''UPDATE Users SET lastmatch=? WHERE id=? ''', (match["MatchID"], user[0]))
+            self.db.execute('''UPDATE Users SET lastmatch=%s WHERE id=%s''', (match["MatchID"], user[0]))
             
             movement = match["CompetitiveMovement"]
             if  movement == "MOVEMENT_UNKNOWN":
@@ -86,8 +113,9 @@ class Valorant(commands.Cog):
             embed.set_author(name = author.name, icon_url=author.avatar_url)
             embed.set_footer(text = str(rating_earned), icon_url = movement_img)
             embed.set_thumbnail(url = thumbnail)
-            await self.channel.send(embed=embed)
-            break
+            for channel in self.channels:
+                if await channel.guild.fetch_member(author.id):
+                    await channel.send(embed=embed)
         conn.commit()
                 
         
@@ -107,7 +135,9 @@ class Valorant(commands.Cog):
         print("authorizing", info[1])
         info = info[0]
         
-        self.db.execute('''INSERT OR IGNORE INTO Users (id, info) VALUES (?,?)''', (ctx.message.author.id, info))
+        self.db.execute('''INSERT INTO Users (id, info) VALUES (%s,%s)
+                            ON CONFLICT (id) DO
+                            UPDATE SET info=%s''', (ctx.message.author.id, info,info))
         conn.commit()
         await ctx.send("Authorized successfully!")
 

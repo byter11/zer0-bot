@@ -18,6 +18,6 @@ if __name__ == '__main__':
 async def on_ready():
 	print("Logged in")
     #Bot Status: ActivityType can be {listening, playing, streaming}
-	await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=";help"))
+	await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name="h!help"))
 
 bot.run(TOKEN)

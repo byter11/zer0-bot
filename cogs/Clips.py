@@ -9,7 +9,7 @@ import json
 class Clips(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.xclient = Client(api_key= os.getenv(XBOX_KEY))
+        self.xclient = Client(api_key= os.getenv("XBOX_KEY"))
         self.gamer = self.xclient.gamer('NOOBboss162')
 
     def getClips(self):
