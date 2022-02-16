@@ -6,6 +6,7 @@ import { dirname, importx } from "@discordx/importer";
 import MongoDatabase from "./services/mongoClient";
 import TaskManager from "./tasks";
 import ValorantHook from "./tasks/valorantHook.task";
+import discordModals from 'discord-modals'
 
 DIService.container = container;
 
@@ -20,6 +21,8 @@ export const client = new Client({
   // If you only want to use global commands only, comment this line
   // botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
 });
+
+discordModals(client);
 
 client.once("ready", async () => {
   await client.guilds.fetch();
@@ -43,7 +46,7 @@ client.on("messageCreate", (message: Message) => {
 
 async function run() {
   await importx(
-    dirname(import.meta.url) + "/{events,commands,api,tasks}/**/*.{ts,js}"
+    dirname(import.meta.url) + "/{events,commands,api}/**/*.{ts,js}"
   );
 
   if (!process.env.BOT_TOKEN) {
@@ -56,5 +59,5 @@ async function run() {
 (new MongoDatabase()).init().then((client) => {
   container.registerInstance("Database", client);
   TaskManager.getInstance().start()
-  // run();
+  run();
 })

@@ -14,7 +14,6 @@ export default class TaskManager {
 
     constructor() {
         const dir = path.join(path.resolve(), 'src/tasks')
-        console.log(dir)
         const files = fs.readdirSync(dir);
         files.forEach(file => {
             if(file.endsWith('.task.ts')){
@@ -24,7 +23,6 @@ export default class TaskManager {
                 });
             }
         });
-        console.log(this._tasks)
     }
 
     public static getInstance(): TaskManager {
@@ -35,11 +33,11 @@ export default class TaskManager {
 
     public async start(){
         while(true) {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 5000));
             const now = Math.round(Date.now() / 1000)
             this._tasks.forEach((task) => {
                 if (now - task.lastRun > task.interval) {
-                    task.authorize();
+                    task.run();
                     task.lastRun = now;
                 }
             })

@@ -4,8 +4,6 @@ import { singleton } from 'tsyringe';
 import config from '../config';
 import User from '../models/User';
 
-const COLLECTION = 'users';
-
 @singleton()
 export default class MongoDatabase implements Database {
     private db: Db | undefined;
@@ -28,7 +26,7 @@ export default class MongoDatabase implements Database {
         })
     }
 
-    addUser(user: User) {
+    addUser(user: User){
         return this.collections.users?.insertOne(user);
     }
 
@@ -45,6 +43,10 @@ export default class MongoDatabase implements Database {
     }
 
     upsertUser(user: User) {
-        return this.collections.users?.updateOne({ id: user.discordId }, { $set: user })
+        return this.collections.users?.updateOne({ id: user.discordId }, { $set: user }, {upsert: true})
+    }
+
+    setLastMatch(id: string, matchId: string) {
+        return this.collections.users?.updateOne({id: id}, { $set: {"valorant.lastMatch": matchId} })
     }
 }
