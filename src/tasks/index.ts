@@ -3,9 +3,9 @@ import path from 'path';
 import { container } from 'tsyringe';
 
 export abstract class Task {
-    interval: number = 60;
+    interval: number = 360;
     lastRun: number = 0;
-    abstract run(): void;
+    abstract run(): Promise<void>;
 }
 
 export default class TaskManager {
@@ -37,8 +37,7 @@ export default class TaskManager {
             const now = Math.round(Date.now() / 1000)
             this._tasks.forEach((task) => {
                 if (now - task.lastRun > task.interval) {
-                    task.run();
-                    task.lastRun = now;
+                    task.run().then(() => task.lastRun = now);
                 }
             })
         }

@@ -7,6 +7,8 @@ import Database from "../services/database.service";
 import User from "../models/User";
 import ValorantAPI from "../services/valorantAPI";
 
+// Temporary
+// Waiting for discord.js to implement modals
 const modal = new Modal()
 .setCustomId('credentials-modal')
 .setTitle('Valorant credentials')

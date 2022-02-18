@@ -2,6 +2,9 @@ import type Database from "../services/database.service";
 import { inject, injectable } from "tsyringe";
 import { Task } from '.';
 import User from "../models/User";
+import { GuildScheduledEvent, MessageEmbed } from "discord.js";
+import { client } from "../main";
+import config from "../config";
 import ValorantAPI from "../services/valorantAPI";
 import _agents from "../../val_assets/agents.json";
 
@@ -17,6 +20,7 @@ const testMatch = {
             characterId: "569fdd95-4d10-43ab-ca70-79becc718b46",
             competitiveTier: 9,
             gameName: 'Iron Yeager',
+            teamId: 'Blue',
             stats: {
               score: 6736,
               roundsPlayed: 28,
@@ -32,7 +36,23 @@ const testMatch = {
               }
             }
         }
-    ]
+    ],
+    teams: [
+        {
+          teamId: 'Red',
+          won: false,
+          roundsPlayed: 24,
+          roundsWon: 11,
+          numPoints: 11
+        },
+        {
+          teamId: 'Blue',
+          won: true,
+          roundsPlayed: 24,
+          roundsWon: 13,
+          numPoints: 13
+        }
+      ]
   }
 
 @injectable()
@@ -42,41 +62,64 @@ export default class ValorantHook extends Task{
         @inject("Database") private _db: Database
     ) {
         super();
-        this._api = new ValorantAPI({
-            user: 'ZEROPIKACHUU',
-            pass: 'noob4026'
-        });
+        const {user='', pass=''} = config.valorant;
+        this._api = new ValorantAPI({ user, pass });
     }
 
     public async run(){
         const users = await this._db.valorantUsers() || []
+        console.log(users);
         console.log('running valorantHook')
         users.forEach(user => {
             if (user && user.valorant)
-                // this.getMatch(user.valorant.id)
-                // .then(match => this.generateEmbed(match, user?.valorant?.id))
-                // .then(embed => {})
-                this.generateEmbed(testMatch, user.valorant.id)
+                this.getMatch(user.valorant.id)
+                .then(match => this.generateEmbed(match, user))
+                .then(embed => this.executeWebhooks(embed, user.discordId))
         })
     }
 
-    private async generateEmbed(match: MatchDetails | any, userId : any) {
-        const player = match.players?.filter((p: any) => p.subject == userId)[0]
+    private async generateEmbed(match: MatchDetails | any, user: User) {
+        const player: Player = match.players?.filter((p: any) => p.subject == user.valorant?.id)[0]
 
         const { matchId, mapId } = match.matchInfo
         const { competitiveTier, gameName }  = player;
-        const stats = {
-            ...player.stats,
-            character: agents[player.characterId]
-        }
+        const character = agents[player.characterId]
+        const {score, kills, deaths, assists} = player.stats;
+        
+        const win = match.teams.filter((team: Team) => team.teamId == player.teamId)[0].won;
+        
+        return new MessageEmbed()
+        .setAuthor({name: gameName, iconURL: character.icon})
+        .setTitle(`${win ? 'Win' : 'Lose'} - some map`)
+        .setDescription(
+            Object.entries({score, kills, deaths, assists}).map(([k,v]) => `${k}: ${v}`).join('\n')
+        )
+    }
 
-        console.log({matchId, mapId, competitiveTier, gameName, stats})
+    private async executeWebhooks(embed: MessageEmbed, userId: any) {
+        client.guilds.cache.forEach(guild => {
+            guild.members.fetch(userId)
+            .then(member => {
+                if(!member)
+                    return;
+                console.log(member)
+                guild.fetchWebhooks()
+                .then(webhooks => webhooks.find(wh => wh.token !== null))
+                .then(wh => {
+                    if(wh){
+                        console.log(wh);
+                        wh.send({embeds: [embed]});
+                    }
+                })
+            })
+            .catch(_ => {})
+        })
     }
 
     private async getMatch(userId: string) {
         const api = await this.apiInstance;
         const matches : Match = await api.matchHistory(userId);
-
+        
         return api.matchDetails(matches.History[0].MatchID);
     }
 

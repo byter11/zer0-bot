@@ -3,25 +3,22 @@ import Database  from './database.service';
 import { singleton } from 'tsyringe';
 import config from '../config';
 import User from '../models/User';
+import Webhook from '../models/Webhook';
+
 
 @singleton()
 export default class MongoDatabase implements Database {
     private db: Db | undefined;
-    private collections: { users?: Collection } = {}
+    private collections: { users?: Collection, webhooks?: Collection} = {}
 
-    constructor() {
-        const client = new MongoClient(config.db.url)
-        client.connect().then(res => {
-            this.db = res.db('BotDB'); 
-            this.collections.users = this.db.collection('users');
-        })
-    }
+    constructor() { }
 
-    init() {
+    async init() {
         return MongoClient.connect(config.db.url).then(client => {
             console.log("Connected")
             this.db = client.db('botDB');
             this.collections.users = this.db.collection('users')
+            this.collections.webhooks = this.db.collection('webhooks')
             return this;
         })
     }
@@ -49,4 +46,13 @@ export default class MongoDatabase implements Database {
     setLastMatch(id: string, matchId: string) {
         return this.collections.users?.updateOne({id: id}, { $set: {"valorant.lastMatch": matchId} })
     }
+
+    webhooks() {
+        return this.collections.webhooks?.find().toArray().then(webhooks => webhooks as Webhook[])
+    }
+
+    registerWebhook(webhook: Webhook) {
+        return this.collections.webhooks?.updateOne({guild: webhook.guild}, { $set: webhook }, {upsert: true})
+    }
+
 }
