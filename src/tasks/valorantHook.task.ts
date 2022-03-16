@@ -111,9 +111,10 @@ export default class ValorantHook extends Task{
             if(!member) return;
 
             await wh.send({
-                username: member.nickname || member?.user.username || wh.name, 
-                avatarURL: member?.user.avatarURL() || member.avatarURL() || wh.avatarURL() || undefined, 
-                embeds: [embed]})
+                username: member.nickname || member?.user.username || wh.name,
+                avatarURL: member?.user.displayAvatarURL({ dynamic: true , size: 2048 , format: "png" }) || member.avatarURL({ dynamic: true , size: 2048 , format: "png" }) || wh.avatarURL() || undefined, 
+                embeds: [embed]
+            })
         })
     }
 
