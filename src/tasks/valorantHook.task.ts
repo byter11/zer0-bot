@@ -55,6 +55,15 @@ const testMatch = {
       ]
   }
 
+const MAPS: {[key: string]: string} = {
+    'Duality': 'Bind',
+    'Ascent': 'Ascent',
+    'Breeze': 'Foxtrot',
+    'Fracture': 'Canyon',
+    'Haven': 'Triad',
+    'Icebox': 'Port',
+    'Split': 'Bonsai'
+}
 @injectable()
 export default class ValorantHook extends Task{
     private _api : ValorantAPI;
@@ -93,10 +102,11 @@ export default class ValorantHook extends Task{
         const {score, kills, deaths, assists} = player.stats;
         
         const win = match.teams.filter((team: Team) => team.teamId == player.teamId)[0].won;
-        
+        const mapCodeName: string = mapId.split('/').pop()
+
         return new MessageEmbed()
         .setAuthor({name: gameName, iconURL: character.icon})
-        .setTitle(`${win ? 'Win' : 'Lose'} - ${mapId.split('/').pop()}`)
+        .setTitle(`${win ? 'Win' : 'Lose'} - ${MAPS[mapCodeName] || mapCodeName}`)
         .setDescription(
             Object.entries({score, kills, deaths, assists}).map(([k,v]) => `${k}: ${v}`).join('\n')
         )
