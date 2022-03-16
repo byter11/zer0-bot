@@ -38,6 +38,7 @@ client.on('modalSubmit', (modal) => {
 				pass: password
 			})).connect()
 			.then(id => {
+				if(!id) return;
 				db.upsertUser(
 					{discordId: modal.user.id, valorant: {id: id}}
 				)?.then(() => {

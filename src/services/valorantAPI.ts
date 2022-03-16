@@ -63,7 +63,6 @@ export default class ValorantAPI{
 			this.headers['Authorization'] = `Bearer ${accessToken}`;
             return accessToken;
         })
-
     }
 
 	private async reAuth() {
@@ -161,6 +160,7 @@ export default class ValorantAPI{
         .then(() => this.entitlement())
         .then(() => this.playerInfo())
 		.then(userId => userId)
+        .catch(e => {})
             // this.clientVersion(userId)
     }
 }
