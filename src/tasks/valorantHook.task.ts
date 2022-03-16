@@ -61,7 +61,7 @@ const MAPS: {[key: string]: string} = {
     Foxtrot: 'Breeze',
     Canyon: 'Fracture',
     Triad: 'Haven',
-    Port: 'Triad',
+    Port: 'Icebox',
     Bonsai: 'Split'
 }
 @injectable()
