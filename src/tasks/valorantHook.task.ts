@@ -70,15 +70,21 @@ export default class ValorantHook extends Task{
         const users = await this._db.valorantUsers() || []
         this._api = await this.apiInstance();
         console.log('running valorantHook')
-        users.forEach(user => {
-            if (user && user.valorant)
-                this.getMatch(user.valorant.id)
-                .then(match => this.generateEmbed(match, user))
-                .then(embed => this.executeWebhooks(embed, user.discordId))
+        users.forEach(async user => {
+            if (!user || !user.valorant) return
+
+            const matchId = await this.getLastMatchId(user.valorant.id);
+            if(!matchId || matchId == user.valorant.lastMatch)  return
+
+            const match : MatchDetails = await this._api.matchDetails(matchId);
+
+            const embed = this.generateEmbed(match, user);
+            await this.executeWebhooks(embed, user.discordId);
+            this._db.setLastMatch(user.discordId, matchId)
         })
     }
 
-    private async generateEmbed(match: MatchDetails | any, user: User) {
+    private generateEmbed(match: MatchDetails | any, user: User) {
         const player: Player = match.players?.filter((p: any) => p.subject == user.valorant?.id)[0]
 
         const { matchId, mapId } = match.matchInfo
@@ -90,13 +96,13 @@ export default class ValorantHook extends Task{
         
         return new MessageEmbed()
         .setAuthor({name: gameName, iconURL: character.icon})
-        .setTitle(`${win ? 'Win' : 'Lose'} - some map`)
+        .setTitle(`${win ? 'Win' : 'Lose'} - ${mapId.split('/').pop()}`)
         .setDescription(
             Object.entries({score, kills, deaths, assists}).map(([k,v]) => `${k}: ${v}`).join('\n')
         )
     }
 
-    private async executeWebhooks(embed: MessageEmbed, userId: any) {
+    private async executeWebhooks(embed: MessageEmbed, userId: string) {
         const webhooks = await this._db.webhooks();
         webhooks?.forEach(async ({id, guildId, url}) => {
             const wh = await client.fetchWebhook(id);
@@ -104,17 +110,17 @@ export default class ValorantHook extends Task{
             const member = await guild?.members.fetch(userId);
             if(!member) return;
 
-            wh.send({
-                username: member.user.username, 
-                avatarURL: member.user.avatarURL() || wh.avatarURL() || undefined, 
+            await wh.send({
+                username: member.nickname || wh.name, 
+                avatarURL: member.avatarURL() || wh.avatarURL() || undefined, 
                 embeds: [embed]})
         })
     }
 
-    private async getMatch(userId: string) {
+    private async getLastMatchId(userId: string) {
         const api = await this.apiInstance();
         const matches : Match = await api.matchHistory(userId);
-        return api.matchDetails(matches.History[0].MatchID);
+        return matches.History[0].MatchID;
     }
 
     private async apiInstance()  : Promise<ValorantAPI> {

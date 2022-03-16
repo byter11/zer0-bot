@@ -40,11 +40,11 @@ export default class MongoDatabase implements Database {
     }
 
     async upsertUser(user: User) {
-        return this.collections.users?.updateOne({ id: user.discordId }, { $set: {valorant: user.valorant} }, {upsert: true})
+        return this.collections.users?.updateOne({ discordId: user.discordId }, { $set: {valorant: user.valorant} }, {upsert: true})
     }
 
     async setLastMatch(id: string, matchId: string) {
-        return this.collections.users?.updateOne({id: id}, { $set: {"valorant.lastMatch": matchId} })
+        return this.collections.users?.updateOne({discordId: id}, { $set: {"valorant.lastMatch": matchId} })
     }
 
     async webhook(guildId: string) {
