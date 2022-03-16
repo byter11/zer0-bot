@@ -1,21 +1,10 @@
-import {REST} from '@discordjs/rest'
-import config from './src/config';
+const { Client, Intents } = require('discord.js');
+const config  = require('../src/config.json');
 
-const rest = new REST({ version: '9' }).setToken(token);
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-
-client.once("ready", async () => {
-	await client.guilds.fetch();
-	rest.get(Routes.applicationCommand(clientId))
-  .then(commands => {
-    commands.forEach(command => 
-      rest.delete(Routes.applicationGuildCommand(clientId, guildId, command.id))
-      .then(() => console.log(`Deleted command: ${command.name}`))
-    )
-})
-.then(() => console.log("Deleting all commands"))
-.catch(error => console.log(error))
-
+client.once('ready', () => {
+	console.log(client.guilds.cache)
 });
 
-await client.login(config.discord.token);
+client.login(config.discord.token);
