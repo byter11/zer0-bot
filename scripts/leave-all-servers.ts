@@ -1,6 +1,6 @@
 import { Client, Intents } from 'discord.js';
 
-const TOKEN = 'NjY1NTIzODc1MTE0OTA5Njk3.Xhm3aA.u4UqAcIO5uYoaGQSpuxyy9k3KYM'
+const TOKEN = ''
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 client.once('ready', async () => {
