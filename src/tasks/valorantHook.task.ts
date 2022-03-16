@@ -56,13 +56,13 @@ const testMatch = {
   }
 
 const MAPS: {[key: string]: string} = {
-    'Duality': 'Bind',
-    'Ascent': 'Ascent',
-    'Breeze': 'Foxtrot',
-    'Fracture': 'Canyon',
-    'Haven': 'Triad',
-    'Icebox': 'Port',
-    'Split': 'Bonsai'
+    Duality: 'Bind',
+    Ascent: 'Ascent',
+    Foxtrot: 'Breeze',
+    Canyon: 'Fracture',
+    Triad: 'Haven',
+    Port: 'Triad',
+    Bonsai: 'Split'
 }
 @injectable()
 export default class ValorantHook extends Task{
@@ -103,6 +103,7 @@ export default class ValorantHook extends Task{
         
         const win = match.teams.filter((team: Team) => team.teamId == player.teamId)[0].won;
         const mapCodeName: string = mapId.split('/').pop()
+        console.log(MAPS[mapCodeName]);
 
         return new MessageEmbed()
         .setAuthor({name: gameName, iconURL: character.icon})
