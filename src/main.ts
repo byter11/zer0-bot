@@ -6,7 +6,7 @@ import { dirname, importx } from "@discordx/importer";
 import MongoDatabase from "./services/mongoClient.js";
 import TaskManager from "./tasks/index.js";
 import config from "./config.js";
-import discordModals from 'discord-modals'
+import discordModals from "discord-modals";
 
 DIService.container = container;
 
@@ -53,11 +53,10 @@ async function run() {
     throw Error("Could not find BOT_TOKEN in your environment");
   }
   await client.login(config.discord.token);
-
 }
 
-(new MongoDatabase()).init().then((client) => {
+new MongoDatabase().init().then((client) => {
   container.registerInstance("Database", client);
-  TaskManager.getInstance().start()
+  TaskManager.getInstance().start();
   run();
-})
+});

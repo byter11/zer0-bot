@@ -1,12 +1,12 @@
-import { WithId, Document, ObjectId } from 'mongodb';
+import { WithId, Document, ObjectId } from "mongodb";
 export default interface User {
-    discordId: string;
-    valorant?: {
-        id: string,
-        name?: string,
-        lastMatch?: string
-    },
-    _id?: ObjectId
+  discordId: string;
+  valorant?: {
+    id: string;
+    name?: string;
+    lastMatch?: string;
+  };
+  _id?: ObjectId;
 }
 
 // const UserSchema = new Schema({
