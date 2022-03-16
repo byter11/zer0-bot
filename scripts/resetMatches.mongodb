@@ -1,3 +1,3 @@
 use('botDB')
 
-db.users.updateMany({}, {$set: {"valorant.lastMatch": null}})
+db.users.updateOne({}, {$set: {"valorant.lastMatch": null}})

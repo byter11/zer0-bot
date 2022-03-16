@@ -3,6 +3,7 @@ export default interface User {
     discordId: string;
     valorant?: {
         id: string,
+        name?: string,
         lastMatch?: string
     },
     _id?: ObjectId

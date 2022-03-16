@@ -89,12 +89,20 @@ export default class ValorantHook extends Task{
 
             const embed = this.generateEmbed(match, user);
             await this.executeWebhooks(embed, user.discordId);
-            this._db.setLastMatch(user.discordId, matchId)
+            // this._db.setLastMatch(user.discordId, matchId)
+            this._db.upsertUser({
+                ...user,
+                valorant: {
+                    id: user.valorant.id,
+                    name: match.players?.find(p => p.subject == user.valorant?.id)?.gameName,
+                    lastMatch: matchId
+                }
+            })
         })
     }
 
     private generateEmbed(match: MatchDetails | any, user: User) {
-        const player: Player = match.players?.filter((p: any) => p.subject == user.valorant?.id)[0]
+        const player: Player = match.players?.find((p: any) => p.subject == user.valorant?.id)
 
         const { matchId, mapId } = match.matchInfo
         const { competitiveTier, gameName }  = player;
@@ -103,7 +111,6 @@ export default class ValorantHook extends Task{
         
         const win = match.teams.filter((team: Team) => team.teamId == player.teamId)[0].won;
         const mapCodeName: string = mapId.split('/').pop()
-        console.log(MAPS[mapCodeName]);
 
         return new MessageEmbed()
         .setAuthor({name: gameName, iconURL: character.icon})
