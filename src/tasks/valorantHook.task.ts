@@ -77,7 +77,8 @@ export default class ValorantHook extends Task {
         Object.entries({ score, kills, deaths, assists })
           .map(([k, v]) => `${k}: ${v}`)
           .join("\n")
-      );
+      )
+      .setThumbnail(`https://github.com/byter11/zer0-bot/raw/main/val_assets/ranks/${competitiveTier}.png`);
   }
 
   private async executeWebhooks(embed: MessageEmbed, userId: string) {
