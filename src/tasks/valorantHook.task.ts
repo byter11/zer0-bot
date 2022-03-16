@@ -111,7 +111,7 @@ export default class ValorantHook extends Task{
             if(!member) return;
 
             await wh.send({
-                username: member.nickname || wh.name, 
+                username: member.nickname || member?.user.username || wh.name, 
                 avatarURL: member?.user.avatarURL() || member.avatarURL() || wh.avatarURL() || undefined, 
                 embeds: [embed]})
         })
