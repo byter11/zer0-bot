@@ -1,9 +1,9 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb';
-import Database  from './database.service';
+import Database  from './database.service.js';
 import { singleton } from 'tsyringe';
-import config from '../config';
-import User from '../models/User';
-import Webhook from '../models/Webhook';
+import config from '../config.js';
+import User from '../models/User.js';
+import Webhook from '../models/Webhook.js';
 
 
 @singleton()

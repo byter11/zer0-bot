@@ -1,11 +1,11 @@
 import type { Base, CommandInteraction, GuildMember, Role } from "discord.js";
 import { Modal, TextInputComponent, showModal } from 'discord-modals';
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from "discordx";
-import { client } from "../main";
+import { client } from "../main.js";
 import { container } from 'tsyringe';
-import Database from "../services/database.service";
-import User from "../models/User";
-import ValorantAPI from "../services/valorantAPI";
+import Database from "../services/database.service.js";
+import User from "../models/User.js";
+import ValorantAPI from "../services/valorantAPI.js";
 
 // Temporary
 // Waiting for discord.js to implement modals

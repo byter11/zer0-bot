@@ -3,9 +3,9 @@ import { container } from "tsyringe";
 import { Intents, Interaction, Message } from "discord.js";
 import { Client, DIService } from "discordx";
 import { dirname, importx } from "@discordx/importer";
-import MongoDatabase from "./services/mongoClient";
-import TaskManager from "./tasks";
-import config from "./config";
+import MongoDatabase from "./services/mongoClient.js";
+import TaskManager from "./tasks/index.js";
+import config from "./config.js";
 import discordModals from 'discord-modals'
 
 DIService.container = container;

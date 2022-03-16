@@ -1,9 +1,9 @@
 import type { Base, CommandInteraction, GuildMember, Role, TextChannel } from "discord.js";
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from "discordx";
-import { client } from "../main";
+import { client } from "../main.js";
 import { container } from 'tsyringe';
-import Database from "../services/database.service";
-import Webhook from "../models/Webhook";
+import Database from "../services/database.service.js";
+import Webhook from "../models/Webhook.js";
 
 
 @Discord()

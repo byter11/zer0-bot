@@ -1,6 +1,6 @@
-import config from '../config';
-import User from '../models/User';
-import Webhook from '../models/Webhook';
+import config from '../config.js';
+import User from '../models/User.js';
+import Webhook from '../models/Webhook.js';
 
 export default interface Database {
     addUser(user: User) : Promise<any>

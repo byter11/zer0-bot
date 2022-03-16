@@ -1,11 +1,11 @@
 import type Database from "../services/database.service";
 import { inject, injectable } from "tsyringe";
-import { Task } from '.';
-import User from "../models/User";
+import { Task } from './index.js';
+import User from "../models/User.js";
 import { GuildScheduledEvent, MessageEmbed } from "discord.js";
-import { client } from "../main";
-import config from "../config";
-import ValorantAPI from "../services/valorantAPI";
+import { client } from "../main.js";
+import config from "../config.js";
+import ValorantAPI from "../services/valorantAPI.js";
 import _agents from "../../val_assets/agents.json";
 
 const agents : Agent = _agents;

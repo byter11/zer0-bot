@@ -17,7 +17,7 @@ export default class TaskManager {
         const files = fs.readdirSync(dir);
         files.forEach(file => {
             if(file.endsWith('.task.ts') || file.endsWith('.task.js')){
-                import('./' + path.basename(file, '.ts')).then((module) =>{
+                import('./' + path.basename(file, '.ts') + '.js').then((module) =>{
                     const task: Task = container.resolve(module.default);
                     this._tasks.push(task)
                 });
