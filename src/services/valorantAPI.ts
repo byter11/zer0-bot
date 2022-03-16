@@ -137,6 +137,7 @@ export default class ValorantAPI{
             console.log('matchHistory: ', res.status);
             return res.json()
         })
+        .catch(e => console.log(e))
     }
 
     public async matchDetails(matchId: string) : Promise<MatchDetails | any>{
@@ -154,13 +155,12 @@ export default class ValorantAPI{
     }
 
     public async connect(){
+        this.AuthTimestamp = Date.now();
         return this.authCookies()
         .then(() => this.authRequest())
         .then(() => this.entitlement())
         .then(() => this.playerInfo())
-		.then(userId => {
-            this.clientVersion(userId)
-            return userId
-        })  
+		.then(userId => userId)
+            // this.clientVersion(userId)
     }
 }

@@ -3,7 +3,7 @@ import path from 'path';
 import { container } from 'tsyringe';
 
 export abstract class Task {
-    interval: number = 360;
+    interval: number = 720;
     lastRun: number = 0;
     abstract run(): Promise<void>;
 }

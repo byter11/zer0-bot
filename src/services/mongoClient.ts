@@ -40,7 +40,7 @@ export default class MongoDatabase implements Database {
     }
 
     async upsertUser(user: User) {
-        return this.collections.users?.updateOne({ id: user.discordId }, { $set: user }, {upsert: true})
+        return this.collections.users?.updateOne({ id: user.discordId }, { $set: {valorant: user.valorant} }, {upsert: true})
     }
 
     async setLastMatch(id: string, matchId: string) {
@@ -56,7 +56,7 @@ export default class MongoDatabase implements Database {
     }
 
     async registerWebhook(webhook: Webhook) {
-        return this.collections.webhooks?.updateOne({guildId: webhook.guildId}, { $set: webhook }, {upsert: true})
+        return this.collections.webhooks?.updateOne({guildId: webhook.guildId}, { $set: {id: webhook.id, url: webhook.url} }, {upsert: true})
     }
-
+    
 }

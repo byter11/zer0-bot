@@ -23,7 +23,7 @@ export abstract class ValSetupCommand {
         .then(() => 
             (interaction.channel as TextChannel).createWebhook('Zero')
         )
-        .then(({id, guildId, url}) => db.registerWebhook(new Webhook(id, guildId, url))
+        .then(({id, guildId, url}) => db.registerWebhook({id, guildId, url})
         .then(() => interaction.editReply("Done"))
         )        
 	}

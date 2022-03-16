@@ -1,5 +1,8 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithId, Document} from 'mongodb';
 
-export default class Webhook {
-    constructor(public id: string, public guildId: string, public url: string) {}
+export default interface Webhook {
+    id: string;
+    guildId: string
+    url: string,
+    _id?: ObjectId
 }

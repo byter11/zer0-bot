@@ -68,7 +68,7 @@ export default class ValorantHook extends Task{
 
     public async run(){
         const users = await this._db.valorantUsers() || []
-        console.log(users);
+        this._api = await this.apiInstance();
         console.log('running valorantHook')
         users.forEach(user => {
             if (user && user.valorant)
@@ -112,16 +112,16 @@ export default class ValorantHook extends Task{
     }
 
     private async getMatch(userId: string) {
-        const api = await this.apiInstance;
+        const api = await this.apiInstance();
         const matches : Match = await api.matchHistory(userId);
-        
         return api.matchDetails(matches.History[0].MatchID);
     }
 
-    private get apiInstance() : Promise<ValorantAPI> {
-        if (Date.now() - this._api.AuthTimestamp > 1000 * 60 * 5)
-            return this._api.connect().catch(e=>console.log(e)).then(() => this._api)
-
-        return new Promise(() => this._api);
+    private async apiInstance()  : Promise<ValorantAPI> {
+        if (Date.now() - this._api.AuthTimestamp > 1000 * 60 * 60 * 12){
+            await this._api.connect();
+            return this._api;
+        }
+        return this._api;
     }
 }

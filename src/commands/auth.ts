@@ -39,7 +39,7 @@ client.on('modalSubmit', (modal) => {
 			})).connect()
 			.then(id => {
 				db.upsertUser(
-					new User(modal.user.id, {id: id})
+					{discordId: modal.user.id, valorant: {id: id}}
 				)?.then(() => {
 				})
 			})
