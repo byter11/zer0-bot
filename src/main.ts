@@ -5,7 +5,7 @@ import { Client, DIService } from "discordx";
 import { dirname, importx } from "@discordx/importer";
 import MongoDatabase from "./services/mongoClient";
 import TaskManager from "./tasks";
-import ValorantHook from "./tasks/valorantHook.task";
+import config from "./config";
 import discordModals from 'discord-modals'
 
 DIService.container = container;
@@ -49,10 +49,10 @@ async function run() {
     dirname(import.meta.url) + "/{events,commands,api}/**/*.{ts,js}"
   );
 
-  if (!process.env.BOT_TOKEN) {
+  if (!config.discord.token) {
     throw Error("Could not find BOT_TOKEN in your environment");
   }
-  await client.login(process.env.BOT_TOKEN);
+  await client.login(config.discord.token);
 
 }
 

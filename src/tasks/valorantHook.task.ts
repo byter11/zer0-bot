@@ -97,22 +97,17 @@ export default class ValorantHook extends Task{
     }
 
     private async executeWebhooks(embed: MessageEmbed, userId: any) {
-        client.guilds.cache.forEach(guild => {
-            guild.members.fetch(userId)
-            .then(member => {
-                if(!member)
-                    return;
-                console.log(member)
-                guild.fetchWebhooks()
-                .then(webhooks => webhooks.find(wh => wh.token !== null))
-                .then(wh => {
-                    if(wh){
-                        console.log(wh);
-                        wh.send({embeds: [embed]});
-                    }
-                })
-            })
-            .catch(_ => {})
+        const webhooks = await this._db.webhooks();
+        webhooks?.forEach(async ({id, guildId, url}) => {
+            const wh = await client.fetchWebhook(id);
+            const guild = client.guilds.cache.get(wh.guildId)
+            const member = await guild?.members.fetch(userId);
+            if(!member) return;
+
+            wh.send({
+                username: member.user.username, 
+                avatarURL: member.user.avatarURL() || wh.avatarURL() || undefined, 
+                embeds: [embed]})
         })
     }
 

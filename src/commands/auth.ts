@@ -28,8 +28,8 @@ const modal = new Modal()
 
 client.on('modalSubmit', (modal) => {
 	if(modal.customId === 'credentials-modal'){
-		const username = modal.components[0].value;
-		const password = modal.components[1].value;
+		const username = modal.fields[0].value;
+		const password = modal.fields[1].value;
 		const db: Database = container.resolve("Database");
 
 		try{

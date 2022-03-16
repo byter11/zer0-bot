@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 export default {
     valorant: {
         user: process.env.VALORANT_USER,
@@ -12,6 +13,6 @@ export default {
     discord: {
         clientId: '',
         clientSecret: '',
-        token: ''
+        token: process.env.BOT_TOKEN
     }
 }

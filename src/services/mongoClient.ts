@@ -23,15 +23,15 @@ export default class MongoDatabase implements Database {
         })
     }
 
-    addUser(user: User){
+    async addUser(user: User){
         return this.collections.users?.insertOne(user);
     }
 
-    discordUsers() {
+    async discordUsers() {
         return this.collections.users?.find({discordId: {$exists: true}}).toArray().then((users)=> users as User[])
     }
 
-    valorantUsers() {
+    async valorantUsers() {
         return this.collections.users?.find({valorant: {$exists: true}}).toArray().then((users)=> users as User[])
     }
 
@@ -39,20 +39,24 @@ export default class MongoDatabase implements Database {
         return []
     }
 
-    upsertUser(user: User) {
+    async upsertUser(user: User) {
         return this.collections.users?.updateOne({ id: user.discordId }, { $set: user }, {upsert: true})
     }
 
-    setLastMatch(id: string, matchId: string) {
+    async setLastMatch(id: string, matchId: string) {
         return this.collections.users?.updateOne({id: id}, { $set: {"valorant.lastMatch": matchId} })
     }
 
-    webhooks() {
+    async webhook(guildId: string) {
+        return this.collections.webhooks?.findOne({guildId: guildId}).then(webhook => webhook as Webhook)
+    }
+
+    async webhooks() {
         return this.collections.webhooks?.find().toArray().then(webhooks => webhooks as Webhook[])
     }
 
-    registerWebhook(webhook: Webhook) {
-        return this.collections.webhooks?.updateOne({guild: webhook.guild}, { $set: webhook }, {upsert: true})
+    async registerWebhook(webhook: Webhook) {
+        return this.collections.webhooks?.updateOne({guildId: webhook.guildId}, { $set: webhook }, {upsert: true})
     }
 
 }
