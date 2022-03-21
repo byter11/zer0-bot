@@ -117,7 +117,7 @@ export default class ValorantAPI {
 
   public async matchHistory(puuid: string): Promise<Match | any> {
     return this.fetch(
-      `https://pd.${this.region}.a.pvp.net/match-history/v1/history/${puuid}`,
+      `https://pd.${this.region}.a.pvp.net/match-history/v1/history/${puuid}?queue=competitive`,
       {
         method: "GET",
         headers: this.headers,
