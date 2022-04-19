@@ -108,7 +108,7 @@ export default class ValorantHook extends Task {
   private async getLastMatchId(userId: string) {
     const api = await this.apiInstance();
     const matches: Match = await api.matchHistory(userId);
-    return matches.History[0].MatchID;
+    return matches?.History?.[0]?.MatchID;
   }
 
   private async apiInstance(): Promise<ValorantAPI> {
