@@ -3,6 +3,7 @@ import Webhook from "../models/Webhook.js";
 
 export default interface Database {
   addUser(user: User): Promise<any>;
+  removeUser(id: string): Promise<any>;
   discordUsers(): Promise<User[] | undefined>;
   valorantUsers(): Promise<User[] | undefined>;
   valorantServers(): string[];

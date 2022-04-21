@@ -25,12 +25,15 @@ const modal = new Modal()
       .setRequired(true)
   );
 
-client.on("modalSubmit", (modal) => {
+client.on("modalSubmit", async (modal) => {
   if (modal.customId === "credentials-modal") {
-    const username = modal.components[0].value;
-    const password = modal.components[1].value;
+    const username = modal.getTextInputValue('credentials-modal-user');
+    const password = modal.getTextInputValue('credentials-modal-pass');
+    // const username = modal.components[0].value;
+    // const password = modal.components[1].value;
     const db: Database = container.resolve("Database");
 
+    await modal.deferReply({ephermal: true});
     try {
       new ValorantAPI({
         user: username,
@@ -42,9 +45,12 @@ client.on("modalSubmit", (modal) => {
           db.upsertUser({
             discordId: modal.user.id,
             valorant: { id: id },
-          })?.then(() => {});
+          })?.then(() => {
+            modal.followUp({ content: 'Authorized' })
+          });
         });
     } catch (e) {
+      modal.followUp({ content: `${e}` });
       console.log(e);
     }
   }
@@ -58,5 +64,20 @@ export abstract class AuthCommand {
       client: client,
       interaction: interaction,
     });
+  }
+}
+
+@Discord()
+export abstract class UnAuthCommand {
+  @Slash("unauth")
+  auth(interaction: CommandInteraction): void {
+    const db: Database = container.resolve("Database");
+    db.removeUser(interaction.user.id)
+    .then(() => {
+      interaction.reply({
+        ephemeral: true,
+        content: "Unauthorized"
+      });
+    })
   }
 }

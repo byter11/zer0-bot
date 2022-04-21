@@ -26,6 +26,10 @@ export default class MongoDatabase implements Database {
     return this.collections.users?.insertOne(user);
   }
 
+  async removeUser(id: string) {
+    return this.collections.users?.deleteOne({discordId: id});
+  }
+
   async discordUsers() {
     return this.collections.users
       ?.find({ discordId: { $exists: true } })
