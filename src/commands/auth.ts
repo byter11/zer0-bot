@@ -33,7 +33,7 @@ client.on("modalSubmit", async (modal) => {
     // const password = modal.components[1].value;
     const db: Database = container.resolve("Database");
 
-    await modal.deferReply({ephermal: true});
+    await modal.deferReply({ephemeral: true});
     try {
       new ValorantAPI({
         user: username,
